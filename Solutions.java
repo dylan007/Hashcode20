@@ -6,11 +6,23 @@ class Solutions {
 	final static int MOD = 998244353;
 	static ArrayList<Integer> score;
 	public static void main(String args[]) throws Exception {
+		PrintStream out = System.out;
+		for(int i=1;i<=6;i++) {
+			String in = i+".in";
+			String ooo = i+".out";
+			System.setIn(new FileInputStream(in));
+			System.setOut(new PrintStream(ooo));
+			long s = solve();
+			out.println(i+ " " + s);
+		}
+	}
+
+	public static long solve() throws Exception {
 		score = new ArrayList<>();
 		int b = nextInt();
 		int l = nextInt();
 		int d = nextInt();
-		int finalScore = 0;
+		long finalScore = 0;
 		for(int i=0;i<b;i++)
 			score.add(nextInt());
 		HashSet<Library> libraries = new HashSet<>();
@@ -35,10 +47,13 @@ class Solutions {
 			}).get();
 			finalScore += min.score;
 			libraries.remove(min);
+			if(min.score==0)
+				continue;
 			List<Integer> books = min.getScans(done, d);
 			done.addAll(books);
 			ans.put(min.idx, books);
 			d-=min.sd;
+			// System.out.println(min.score);
 		}
 		System.out.println(ans.size());
 		for(int lib:ans.keySet()) {
@@ -49,6 +64,7 @@ class Solutions {
 			}
 			System.out.println();
 		}
+		return finalScore;
 		// System.out.println(finalScore);
 	}
 
