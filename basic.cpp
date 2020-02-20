@@ -55,7 +55,6 @@ int main() {
     libs.push_back(_l);
   }
 
-//  printLibs(libs);
   sort(libs.begin(), libs.end(), [](const Lib &lhs, const Lib &rhs) {
     if (lhs.signup_time == rhs.signup_time) {
       if (lhs.books_per_day == rhs.books_per_day) {
@@ -65,13 +64,12 @@ int main() {
     }
     return lhs.signup_time < rhs.signup_time;
   });
-//  printLibs(libs);
 
   cout << num_libs << endl;
   for (auto &lib : libs) {
     cout << lib.id << " " << lib.num_books << endl;
     sort(lib.books.begin(), lib.books.end(), [](const pair<uint32_t, uint32_t> &lhs, const pair<uint32_t, uint32_t> &rhs){
-      return (lhs.first > rhs.second);
+      return (lhs.second > rhs.second);
     });
     for (auto &book: lib.books) {
       cout << book.first << " ";
