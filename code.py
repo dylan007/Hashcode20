@@ -18,7 +18,7 @@ for _ in range(L):
 	for i in ids:
 		book_f[i]+=1
 for i in range(B):
-	new_scores[i]=books[i]/max(book_f[i],1)
+	new_scores[i]=books[i] #/max(book_f[i]**(0.93),1)
 
 def value(elem):
 	return new_scores[elem]
@@ -34,7 +34,8 @@ def rescore(library,days,ndone):
 		for j in range(nums):
 			score += new_scores[library[i]["ids"][j]]
 		library[i]["score"]=score
-		ww=randint(140,180)/100
+		ww=randint(75,95)/100
+		# ww=1
 		if (library[largest]["score"])**(ww)/library[largest]["t"] < (library[i]["score"])**(ww)/library[i]["t"]:
 			largest = i
 	return largest
@@ -53,7 +54,7 @@ def calc_scores(library,i,days):
 		else:
 			k = library[i]["ids"][j]
 			if new_scores[k]>0:
-				new_scores[k]=books[k]/max(1,-1+books[k]/new_scores[k])
+				new_scores[k]=books[k] #/max(1,(-1+books[k]/new_scores[k])**(0.93))
 	print()
 	return score
 
