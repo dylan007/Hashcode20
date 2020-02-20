@@ -33,18 +33,19 @@ def rescore(library,days,ndone):
 		for j in range(nums):
 			score += new_scores[library[i]["ids"][j]]
 		library[i]["score"]=score
-		if library[largest]["score"] < library[i]["score"]:
+		if library[largest]["score"]/library[largest]["t"] < library[i]["score"]/library[i]["t"]:
 			largest = i
 	return largest
 
 def calc_scores(library,i,days):
 	score=0
 	library[i]["score"]=0
-	ds=(D-days-library[i]["t"])*library[i]["m"]
+	ds=max(0,(D-days-library[i]["t"])*library[i]["m"])
 	print(min(ds,library[i]["n"]))
 	for j in range(library[i]["n"]):
 		if j < ds:
-			score += books[library[i]["ids"][j]]
+			if(new_scores[library[i]["ids"][j]]>0):
+				score += books[library[i]["ids"][j]]
 			print(library[i]["ids"][j],end=' ')
 			new_scores[library[i]["ids"][j]]=0
 		else:
@@ -58,10 +59,12 @@ tots=0
 passed=0
 nd=set([i for i in range(L)])
 print(L)
+count=0
 while passed <D:
+	count+=1
 	ind=rescore(lib,0,nd)
 	nd.discard(ind)
 	print(ind,end=' ')
 	tots+=calc_scores(lib,ind,passed)
 	passed+=lib[ind]["t"]
-print(tots)
+print(count,tots)
