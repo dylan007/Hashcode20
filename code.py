@@ -33,7 +33,7 @@ def rescore(library,days,ndone):
 		for j in range(nums):
 			score += new_scores[library[i]["ids"][j]]
 		library[i]["score"]=score
-		if library[largest]["score"]/library[largest]["t"] < library[i]["score"]/library[i]["t"]:
+		if (library[largest]["score"])**(1.5)/library[largest]["t"] < (library[i]["score"])**(1.5)/library[i]["t"]:
 			largest = i
 	return largest
 
