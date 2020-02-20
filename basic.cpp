@@ -65,13 +65,38 @@ int main() {
     return lhs.signup_time < rhs.signup_time;
   });
 
-  cout << num_libs << endl;
+  // SORT BOOKS
   for (auto &lib : libs) {
-    cout << lib.id << " " << lib.num_books << endl;
-    sort(lib.books.begin(), lib.books.end(), [](const pair<uint32_t, uint32_t> &lhs, const pair<uint32_t, uint32_t> &rhs){
-      return (lhs.second > rhs.second);
-    });
-    for (auto &book: lib.books) {
+    sort(lib.books.begin(), lib.books.end(),
+         [](const pair<uint32_t, uint32_t> &lhs,
+            const pair<uint32_t, uint32_t> &rhs) {
+           return (lhs.second > rhs.second);
+         });
+  }
+
+  // DUPLICATE REMOVAL
+  unordered_set<uint32_t> book_set;
+  std::vector<Lib> new_libs;
+  for (auto &lib : libs) {
+    vector<pair<uint32_t, uint32_t>> new_books;
+    for (auto b : lib.books) {
+      if (book_set.find(b.first) == book_set.end()) {
+        new_books.push_back(b);
+        book_set.insert(b.first);
+      }
+    }
+    lib.books = new_books;
+    if (lib.books.size() != 0) {
+      new_libs.push_back(lib);
+    }
+  }
+  libs = new_libs;
+
+  // FINAL OUTPUT
+  cout << libs.size() << endl;
+  for (auto &lib : libs) {
+    cout << lib.id << " " << lib.books.size() << endl;
+    for (auto &book : lib.books) {
       cout << book.first << " ";
     }
     cout << endl;
