@@ -1,1 +1,1 @@
-# Hash code 2020 repo for TEAM_NAME_HERE
+# HashCode 2020 repo for Kamikaze Pirates
