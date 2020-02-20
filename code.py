@@ -1,3 +1,4 @@
+from random import randint
 B, L, D = [int(i) for i in input().split()]
 books = [int(i) for i in input().split()]
 new_scores = [0 for i in range(B)]
@@ -33,7 +34,8 @@ def rescore(library,days,ndone):
 		for j in range(nums):
 			score += new_scores[library[i]["ids"][j]]
 		library[i]["score"]=score
-		if (library[largest]["score"])**(1.5)/library[largest]["t"] < (library[i]["score"])**(1.5)/library[i]["t"]:
+		ww=randint(140,180)/100
+		if (library[largest]["score"])**(ww)/library[largest]["t"] < (library[i]["score"])**(ww)/library[i]["t"]:
 			largest = i
 	return largest
 
