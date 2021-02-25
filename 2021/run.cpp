@@ -93,14 +93,26 @@ vector<Car*> cars;
 unordered_map<string, Street*> streets;
 unordered_map<int, Intersection*> intersections;
 
+
+template <typename T1, typename T2>
+struct comp {
+  typedef pair<T1, T2> type;
+  bool operator()(type const& a, type const& b) const {
+    return a.second > b.second;
+  }
+};
+
 void final_solution() {
   std::cout << intersections.size() << endl;
   for (auto &in : intersections) {
     std::cout << in.first << endl;
     auto I = in.second;
     std::cout << I->streets.size() << endl;
-    
-    for (auto &s: I->streets) {
+
+    vector<pair<string, float> > mapcopy(I->streets.begin(), I->streets.end());
+    sort(mapcopy.begin(), mapcopy.end(), comp<string, float>());
+
+    for (auto &s: mapcopy) {
       int ans = floor(s.second) == 0? 1 : floor(s.second);
       std::cout << s.first << " " << ans << endl;
     }
@@ -152,7 +164,9 @@ void solve() {
       // intersections[street->e]->update_score(street->n, streets[c->path[i]]->l);
       // intersections[street->e]->update_score(street->n, streets[c->path[i]]->l * 1.0 / (i+1));
       // intersections[street->e]->update_score(street->n, 1.0 / (i+1));
-      intersections[street->e]->update_score(street->n, 1.0 / sqrt(i+1));
+      // intersections[street->e]->update_score(street->n, 1.0 / sqrt(i+1));
+      // intersections[street->e]->update_score(street->n, streets[c->path[i+1]]->l * 1.0 / (i+1));
+      intersections[street->e]->update_score(street->n, streets[c->path[i+1]]->l * 1.0 / sqrt(i+1));
     }
     string lastStr = c->path[c->path.size() - 1];
     Street* lastStreet = streets[lastStr];
