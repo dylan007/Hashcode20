@@ -1,3 +1,4 @@
+import os
 from typing import List, Dict
 
 
@@ -8,6 +9,7 @@ class Street:
         self.end = e
         self.name = name
         self.distance = distance
+        self.cars: List[Car] = []
 
     def __repr__(self):
         return f"({self.start}, {self.end}, {self.name}, {self.distance})"
@@ -38,11 +40,40 @@ class Simulation:
                 car = Car()
                 for street in strts[1:]:
                     car.streets.append(self.streets[street])
+                    self.streets[street].cars.append(car)
                 self.cars.append(car)
 
     def __repr__(self):
         return "\n".join([i.__repr__() for i in self.cars])
 
 
-simulation = Simulation("/home/shreyansh/Downloads/a.txt")
-print(simulation)
+def run(in_path: str, out_path: str):
+    simulation = Simulation(in_path)
+    intersections: Dict[int, List[Street]] = {}
+    for street_name, street in simulation.streets.items():
+        intersection = street.end
+        if len(street.cars) == 0:
+            continue
+        if intersection not in intersections:
+            intersections[intersection] = []
+        intersections[intersection].append(street)
+
+    lines: List[str] = [str(len(intersections))]
+    for intersection, streets in intersections.items():
+        lines.append(str(intersection))
+        lines.append(str(len(streets)))
+        for street in streets:
+            lines.append(f"{street.name} {min(simulation.time, street.distance, len(street.cars))}")
+
+    with open(out_path, "w") as f:
+        for line in lines:
+            f.write(line+"\n")
+
+
+prefix = "out1"
+try:
+    os.mkdir(prefix)
+except Exception:
+    pass
+for file_name in ["a", "b", "c", "d", "e", "f"]:
+    run(f"input/{file_name}.txt", f"{prefix}/{file_name}.txt")
