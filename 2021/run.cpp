@@ -6,7 +6,7 @@ int sim_time;
 int n_intersections;
 int n_streets;
 int n_cars;
-int score;
+int kScore;
 
 struct Street {
   int s, e, l;
@@ -44,29 +44,68 @@ struct Car {
 
 struct Intersection {
   int num, n_inter;
-  vector<string> streets;
+  unordered_map<string, float> streets;
 
   Intersection(int n) {
     num = n;
   }
 
   void insert(string street) {
-    streets.push_back(street);
+    streets.insert(make_pair(street, 0));
   }
 
   void print() {
     std::cout << "Intersection " << num << ":[";
     string output = "";
     for (auto& s: streets) {
-      output += s + ", ";
+      output += s.first + " = " + to_string(s.second) + ", ";
     }
     cout << output << "]\n";
+  }
+
+  void update_score(string street, float score) {
+    streets[street] += score;
+  }
+
+  void normalize() {
+    if (streets.size() <= 1) {
+      for (auto &s: streets) {
+        s.second = 1.0;
+      }
+    }
+
+    float total = 0;
+    for (auto &s: streets) {
+      total += s.second;
+    }
+
+    if (total < sim_time * 1.0) {
+      return;
+    }
+
+    for (auto &s: streets) {
+      s.second = (s.second / total) * sim_time;
+    }
   }
 };
 
 vector<Car*> cars;
 unordered_map<string, Street*> streets;
 unordered_map<int, Intersection*> intersections;
+
+void final_solution() {
+  std::cout << intersections.size() << endl;
+  for (auto &in : intersections) {
+    std::cout << in.first << endl;
+    auto I = in.second;
+    std::cout << I->streets.size() << endl;
+    
+    for (auto &s: I->streets) {
+      int ans = floor(s.second) == 0? 1 : floor(s.second);
+      std::cout << s.first << " " << ans << endl;
+    }
+  }
+}
 
 void input_street() {
   int s, e, l;
@@ -101,12 +140,37 @@ void input_car() {
   cars.push_back(new Car(paths));
 }
 
+void solve() {
+  unordered_map<string, int> traffics; // [intersection, street] -> (num cars * time to next)
+
+  for (auto c : cars) {
+    for (int i = 0; i < c->path.size() - 1; ++i) {
+      string str = c->path[i];
+      Street* street = streets[str];
+      // intersections[street->e]->update_score(street->n, street->l);
+      // intersections[street->e]->update_score(street->n, 1);
+      // intersections[street->e]->update_score(street->n, streets[c->path[i]]->l);
+      // intersections[street->e]->update_score(street->n, streets[c->path[i]]->l * 1.0 / (i+1));
+      // intersections[street->e]->update_score(street->n, 1.0 / (i+1));
+      intersections[street->e]->update_score(street->n, 1.0 / sqrt(i+1));
+    }
+    string lastStr = c->path[c->path.size() - 1];
+    Street* lastStreet = streets[lastStr];
+    intersections[lastStreet->e]->update_score(
+      lastStreet->n, 1);
+  }
+
+  for (auto in: intersections) {
+    in.second->normalize();
+  }
+}
+
 void input() {
   cin >> sim_time
       >> n_intersections
       >> n_streets
       >> n_cars
-      >> score;
+      >> kScore;
 
   for (int i = 0; i < n_streets; ++i) {
     input_street();
@@ -120,15 +184,23 @@ void input() {
 int main() {
   input();
 
-  for (auto s: streets) {
-    s.second->print();
-  }
+//  for (auto s: streets) {
+//    s.second->print();
+//  }
+//
+//  for (auto c: cars) {
+//    c->print();
+//  }
+//
+//  for (auto i : intersections) {
+//    i.second->print();
+//  }
 
-  for (auto c: cars) {
-    c->print();
-  }
+  solve();
 
-  for (auto i : intersections) {
-    i.second->print();
-  }
+//  for (auto i : intersections) {
+//    i.second->print();
+//  }
+
+  final_solution();
 }
