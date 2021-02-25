@@ -10,7 +10,7 @@ class Street:
         self.distance = distance
 
     def __repr__(self):
-        return f"({self.start}, {self.end}, {self.name}, {self.distance}"
+        return f"({self.start}, {self.end}, {self.name}, {self.distance})"
 
 
 class Car:
@@ -31,13 +31,17 @@ class Simulation:
             self.streets: Dict[str, Street] = {}
             self.cars: List[Car] = []
             for idx in range(1, 1+s):
-                b, e, name, le = lines[idx].split(" ")
+                b, e, name, le = lines[idx].strip().split(" ")
                 self.streets[name] = Street(int(b), int(e), name, int(le))
             for idx in range(1+s, 1+s+v):
-                strts = lines[idx].split(" ")
+                strts = lines[idx].strip().split(" ")
                 car = Car()
                 for street in strts[1:]:
                     car.streets.append(self.streets[street])
+                self.cars.append(car)
+
+    def __repr__(self):
+        return "\n".join([i.__repr__() for i in self.cars])
 
 
 simulation = Simulation("/home/shreyansh/Downloads/a.txt")
