@@ -1,1 +1,3 @@
-# HashCode 2020 repo for Kamikaze Pirates
+# HashCode repo for Kamikaze Pirates
+
+Years: 2020, 2021
