@@ -98,6 +98,7 @@ public:
     int bestBefore;
     int nRoles;
     vector<Role> roles;
+    int maxLevel;
 
     Project()
     {
@@ -119,6 +120,7 @@ public:
              << "Score : " << score << endl
              << "Best Before : " << bestBefore << endl
              << "Number of Roles : " << nRoles << endl
+             << "Max Level : " << maxLevel << endl
              << "Roles Required : " << endl;
         for (auto role : roles)
         {
@@ -134,40 +136,133 @@ public:
         cin >> x.name;
         cin >> x.daysToComplete;
         cin >> x.score >> x.bestBefore >> x.nRoles;
+        x.maxLevel = 0;
         REP(i, x.nRoles)
         {
             x.roles.push_back(Role::buildRole());
+            x.maxLevel = max(x.maxLevel, x.roles.back().level);
         }
         return x;
     }
 };
+
+class Person
+{
+public:
+    string name;
+    unordered_map<string, Role> skills;
+
+    Person()
+    {
+    }
+
+    Person(string name, unordered_map<string, Role> skills)
+    {
+        name = name;
+        skills = skills;
+    }
+
+    void update(string skillName, int skillLevel)
+    {
+        skills[skillName].level += (skills[skillName].level == skillLevel);
+    }
+
+public:
+    static Person createPerson()
+    {
+        Person x = Person();
+        cin >> x.name;
+        int nSkills;
+        cin >> nSkills;
+        REP(i, nSkills)
+        {
+            Role xRole = Role::buildRole();
+            x.skills[xRole.name] = xRole;
+        }
+        return x;
+    }
+};
+
+class Project_Compare
+{
+public:
+    bool operator()(const Project &a, const Project &b)
+    {
+        if (a.maxLevel != b.maxLevel)
+            return (a.maxLevel < b.maxLevel);
+        if (a.score != b.score)
+            return (a.score > b.score);
+        if (a.daysToComplete != b.daysToComplete)
+            return (a.daysToComplete < b.daysToComplete);
+        if (a.bestBefore != b.bestBefore)
+            return (a.bestBefore < b.bestBefore);
+        return false;
+    }
+};
+
+map<string, Person> contributors;
 
 int main()
 {
     fast_io;
     ll c, p;
     cin >> c >> p;
-    map<string, vector<Role>> contributors;
+    contributors = map<string, Person>();
     REP(i, c)
     {
-        string name;
-        cin >> name;
-        int nSkills;
-        cin >> nSkills;
-        vector<Role> skills = vector<Role>();
-        REP(j, nSkills)
-        skills.push_back(Role::buildRole());
-        cout << name << endl;
-        for (auto it : skills)
-            it.printRole();
-        cout << endl;
+        Person x = Person::createPerson();
+        contributors[x.name] = x;
     }
-    vector<Project> projects = vector<Project>();
+    list<Project> projects = list<Project>();
     REP(i, p)
     {
         projects.push_back(Project::buildProject());
     }
-    for (auto it : projects)
-        it.printProject();
+    Project_Compare cmp;
+
+    projects.sort(cmp);
+    // for (auto it : projects)
+    //     it.printProject();
+
+    vector<pair<string, vector<string>>> output = vector<pair<string, vector<string>>>();
+    for (auto project : projects)
+    {
+        int check = 1;
+        vector<string> persons = vector<string>();
+        unordered_set<string> taken;
+        for (auto skill : project.roles)
+        {
+            int f = 0;
+            for (auto person : contributors)
+            {
+                if (taken.find(person.second.name) != taken.end())
+                    continue;
+                string skillName = skill.name;
+                if (person.second.skills.find(skillName) != person.second.skills.end())
+                {
+                    f |= (person.second.skills[skillName].level >= skill.level);
+                    if (f)
+                    {
+                        persons.push_back(person.second.name);
+                        taken.insert(person.second.name);
+                        person.second.update(skillName, skill.level);
+                        break;
+                    }
+                }
+            }
+            check &= f;
+        }
+        if (check)
+            output.push_back(MK(project.name, persons));
+    }
+
+    cout << output.size() << endl;
+    for (auto project : output)
+    {
+        cout << project.first << endl;
+        for (auto name : project.second)
+            cout << name << " ";
+        cout << endl;
+    }
     return 0;
 }
